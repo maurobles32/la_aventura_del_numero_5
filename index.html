@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>La Aventura del Número 5 - ¡Con Galería de Diplomas y Sonido!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            yellow: '#facc15',
+                            orange: '#fb923c',
+                            teal: '#2dd4bf',
+                            blue: '#38bdf8',
+                            purple: '#a855f7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Comic Sans MS', 'Bubblegum Sans', 'Quicksand', 'Nunito', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', 'Comic Sans MS', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bouncing {
+            animation: bounce 1.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+            50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+        }
+        .pulse-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .pulse-btn:hover {
+            transform: scale(1.03);
+        }
+        .pulse-btn:active {
+            transform: scale(0.97);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffedd5;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f97316;
+            border-radius: 8px;
+        }
+
+        /* PRINT STYLES FOR PDF DIPLOMA */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #screen-diploma-celebration, #screen-diploma-celebration * {
+                visibility: visible;
+            }
+            #screen-diploma-celebration {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100vw;
+                height: 100vh;
+                background: white !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-diploma-box {
+                border: 8px solid #ea580c !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                max-width: 1000px !important;
+                background: #fff7ed !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-500 via-orange-600 to-red-700 min-h-screen text-gray-800 flex flex-col justify-between">
+
+    <!-- TOP HEADER / HUD -->
+    <header class="bg-white/95 backdrop-blur-md shadow-lg py-3 px-3 sm:px-8 sticky top-0 z-50 flex flex-wrap justify-between items-center border-b-4 border-yellow-400 gap-2 no-print">
+        <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onclick="showScreen('home')">
+            <div class="bg-yellow-400 p-2 sm:p-2.5 rounded-2xl shadow-md border-2 border-yellow-500 text-xl sm:text-2xl bouncing">
+                🦊
+            </div>
+            <div>
+                <h1 class="text-lg sm:text-2xl font-black text-orange-700 tracking-wide drop-shadow-sm">Aventura del 5</h1>
+                <p class="text-[10px] sm:text-xs font-bold text-amber-600">¡Hola, <span class="student-name-display text-orange-800 font-black">Estudiante</span>!</p>
+            </div>
+        </div>
+
+        <!-- REWARDS HUD -->
+        <div class="flex items-center space-x-2 sm:space-x-6 my-1 sm:my-0">
+            <div class="flex items-center bg-yellow-100 border-2 border-yellow-400 px-2.5 sm:px-3 py-1 rounded-full shadow-inner">
+                <span class="text-base sm:text-xl mr-1">⭐</span>
+                <span id="hud-stars" class="font-black text-yellow-700 text-sm sm:text-lg">0</span>
+            </div>
+            <div class="flex items-center bg-amber-100 border-2 border-amber-400 px-2.5 sm:px-3 py-1 rounded-full shadow-inner">
+                <span class="text-base sm:text-xl mr-1">🪙</span>
+                <span id="hud-coins" class="font-black text-amber-700 text-sm sm:text-lg">0</span>
+            </div>
+            <div class="flex items-center bg-orange-100 border-2 border-orange-400 px-2.5 sm:px-3 py-1 rounded-full shadow-inner">
+                <span class="text-base sm:text-xl mr-1">🏆</span>
+                <span id="hud-medals" class="font-black text-orange-700 text-sm sm:text-lg">0</span>
+            </div>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2">
+            <button onclick="toggleAudio()" id="audio-btn" class="bg-orange-100 hover:bg-orange-200 text-orange-700 p-2 sm:p-2.5 rounded-xl border-2 border-orange-300 transition shadow-md" title="Sonido">
+                🔊
+            </button>
+            <button onclick="openProfileSettings()" class="bg-amber-100 hover:bg-amber-200 text-amber-700 p-2 sm:p-2.5 rounded-xl border-2 border-amber-300 transition shadow-md flex items-center space-x-1" title="Perfil y Nombre">
+                <span>👤</span>
+                <span class="hidden sm:inline text-xs font-bold">Perfil</span>
+            </button>
+            <button onclick="showScreen('shop')" class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-bold px-2.5 sm:px-3 py-2 rounded-xl shadow-md border-2 border-yellow-500 transition flex items-center space-x-1">
+                <span>🎒</span>
+                <span class="hidden sm:inline">Tienda</span>
+            </button>
+            <button onclick="showScreen('stats')" class="bg-teal-100 hover:bg-teal-200 text-teal-700 p-2 sm:p-2.5 rounded-xl border-2 border-teal-300 transition shadow-md" title="Progreso">
+                📊
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-grow flex items-center justify-center p-3 sm:p-6 max-w-6xl mx-auto w-full">
+
+        <!-- SCREEN 0: MÓDULO INICIAL DE REGISTRO DEL ESTUDIANTE -->
+        <div id="screen-register" class="screen hidden w-full flex flex-col items-center animate-fade">
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-yellow-400 max-w-xl w-full text-center relative overflow-hidden">
+                <div class="text-6xl sm:text-7xl mb-3 bouncing">🦊</div>
+                <h2 class="text-2xl sm:text-4xl font-black text-orange-700 mb-2">¡Hola! ¿Cómo te llamas?</h2>
+                <p class="text-gray-600 text-sm sm:text-base font-bold mb-6">Escribe tu nombre para comenzar tu gran aventura matemática con el 5.</p>
+                
+                <div class="mb-4">
+                    <input type="text" id="student-name-input" placeholder="Tu nombre aquí..." class="w-full px-4 py-3 sm:py-4 rounded-2xl border-4 border-orange-300 focus:border-orange-500 focus:outline-none text-xl sm:text-2xl font-black text-center text-orange-800 shadow-inner bg-orange-50/50">
+                    <p id="register-error" class="text-red-500 font-bold text-xs sm:text-sm mt-2 min-h-[20px]"></p>
+                </div>
+
+                <button onclick="handleRegisterStudent()" class="pulse-btn w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black py-4 rounded-2xl shadow-lg text-lg sm:text-xl border-2 border-orange-400 transition">
+                    ¡COMENZAR A APRENDER! 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 0.1: SALUDO DE BIENVENIDA PERSONALIZADO -->
+        <div id="screen-welcome-greeting" class="screen hidden w-full flex flex-col items-center animate-fade">
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-orange-400 max-w-2xl w-full text-center relative overflow-hidden">
+                <div class="text-6xl sm:text-7xl mb-3 bouncing">🌟</div>
+                <div id="welcome-greeting-text" class="text-orange-900 text-base sm:text-xl font-bold mb-8 leading-relaxed">
+                    <!-- Dynamic Greeting -->
+                </div>
+                <button onclick="showScreen('home')" class="pulse-btn w-full bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-white font-black py-4 rounded-2xl shadow-lg text-lg sm:text-xl border-2 border-yellow-500 transition">
+                    ¡SÍ, VAMOS A JUGAR! 🎉
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN: PERFIL Y CAMBIO DE NOMBRE -->
+        <div id="screen-profile" class="screen hidden w-full flex flex-col items-center animate-fade">
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-amber-400 max-w-xl w-full text-center">
+                <div class="text-5xl mb-3">👤</div>
+                <h2 class="text-2xl sm:text-3xl font-black text-amber-700 mb-2">Perfil del Estudiante</h2>
+                <p class="text-gray-600 text-sm sm:text-base font-bold mb-6">Puedes actualizar tu nombre o cerrar sesión.</p>
+                
+                <div class="mb-4 text-left">
+                    <label class="block text-xs font-black text-amber-800 uppercase mb-1">Nombre del Estudiante:</label>
+                    <input type="text" id="settings-name-input" class="w-full px-4 py-3 rounded-2xl border-4 border-amber-300 focus:border-amber-500 focus:outline-none text-lg sm:text-xl font-black text-amber-800 shadow-inner bg-amber-50/50">
+                    <p id="settings-error" class="text-green-600 font-bold text-xs sm:text-sm mt-2 min-h-[20px]"></p>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <div class="flex gap-3">
+                        <button onclick="showScreen('home')" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-2xl shadow transition">
+                            Volver
+                        </button>
+                        <button onclick="saveProfileSettings()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-black py-3 rounded-2xl shadow transition">
+                            Guardar 💾
+                        </button>
+                    </div>
+                    <button onclick="logoutStudent()" class="w-full bg-red-100 hover:bg-red-200 text-red-700 font-bold py-3 rounded-2xl border-2 border-red-300 shadow transition text-sm sm:text-base">
+                        🚪 Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 1: HOME / MENU -->
+        <div id="screen-home" class="screen w-full flex flex-col items-center animate-fade">
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-5 sm:p-8 shadow-2xl border-4 border-yellow-400 max-w-3xl w-full text-center relative overflow-hidden mb-5">
+                <div class="absolute -right-6 -bottom-6 text-8xl opacity-10">🦊</div>
+                <div class="inline-block bg-yellow-300 text-yellow-900 font-extrabold px-4 py-1 rounded-full text-xs sm:text-base mb-2 shadow-sm border border-yellow-400">
+                    ✨ ¡Hola, <span class="student-name-display text-yellow-900 font-black">Estudiante</span>! Misión Tabla del 5 y Divisiones ✨
+                </div>
+                <h2 class="text-2xl sm:text-5xl font-black text-orange-700 mb-2 sm:mb-3 drop-shadow">¡La Aventura del Número 5!</h2>
+                <p class="text-gray-600 text-sm sm:text-lg mb-4 sm:mb-6">Diviértete con los módulos de Concéntrese, Match y consigue tu Diploma Oficial.</p>
+                
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="showScreen('diploma-gallery')" class="pulse-btn bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-black px-6 py-3 rounded-2xl shadow-lg border-2 border-orange-400 text-sm sm:text-base flex items-center space-x-2">
+                        <span>🏆</span>
+                        <span>Mi Galería de Diplomas</span>
+                    </button>
+                    <button onclick="checkDiplomaEligibility()" class="pulse-btn bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-black px-6 py-3 rounded-2xl shadow-lg border-2 border-red-400 text-sm sm:text-base flex items-center space-x-2">
+                        <span>📜</span>
+                        <span>Diploma Oficial</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE GRID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-5xl w-full">
+                <!-- Mod 1: Tabla del 5 -->
+                <div onclick="startModule(1)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-orange-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-orange-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 1</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">✖️</div>
+                        <h3 class="text-lg sm:text-xl font-black text-orange-700 mb-1 sm:mb-2">La Tabla del 5</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Aprende sumando grupos de cinco elementos y saltando de 5 en 5.</p>
+                    </div>
+                    <div class="bg-orange-100 text-orange-700 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-orange-500 group-hover:text-white transition text-sm">
+                        ¡Multiplicar! 🚀
+                    </div>
+                </div>
+
+                <!-- Mod 2: Dividir entre 5 -->
+                <div onclick="startModule(2)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-amber-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-amber-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 2</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">➗</div>
+                        <h3 class="text-lg sm:text-xl font-black text-amber-700 mb-1 sm:mb-2">Dividir entre 5</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Descubre cómo repartir equitativamente entre 5 amigos.</p>
+                    </div>
+                    <div class="bg-amber-100 text-amber-700 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-amber-500 group-hover:text-white transition text-sm">
+                        ¡Dividir! 🍰
+                    </div>
+                </div>
+
+                <!-- Mod 3: Completa la Multiplicación -->
+                <div onclick="startModule(3)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-yellow-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-yellow-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 3</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">🧩</div>
+                        <h3 class="text-lg sm:text-xl font-black text-yellow-700 mb-1 sm:mb-2">Completa Multiplicación</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Encuentra el factor que falta en multiplicaciones del 5.</p>
+                    </div>
+                    <div class="bg-yellow-100 text-yellow-800 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-yellow-400 group-hover:text-white transition text-sm">
+                        ¡Resolver Mult! 🕵️‍♂️
+                    </div>
+                </div>
+
+                <!-- Mod 4: Completa la División -->
+                <div onclick="startModule(4)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-teal-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-teal-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 4</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">🔍</div>
+                        <h3 class="text-lg sm:text-xl font-black text-teal-700 mb-1 sm:mb-2">Completa División</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Encuentra el resultado faltante en divisiones entre 5.</p>
+                    </div>
+                    <div class="bg-teal-100 text-teal-800 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-teal-400 group-hover:text-white transition text-sm">
+                        ¡Resolver Div! 🎯
+                    </div>
+                </div>
+
+                <!-- Mod 5: Atrapa Multiplicación -->
+                <div onclick="startModule(5)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-orange-500 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-orange-500 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 5</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">⭐</div>
+                        <h3 class="text-lg sm:text-xl font-black text-orange-700 mb-1 sm:mb-2">Atrapa la Multiplicación</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Minijuego rápido de selección múltiple para multiplicar por 5.</p>
+                    </div>
+                    <div class="bg-orange-100 text-orange-700 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-orange-600 group-hover:text-white transition text-sm">
+                        ¡Jugar Mult! 🎮
+                    </div>
+                </div>
+
+                <!-- Mod 6: Atrapa División -->
+                <div onclick="startModule(6)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-red-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-red-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 6</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">💫</div>
+                        <h3 class="text-lg sm:text-xl font-black text-red-700 mb-1 sm:mb-2">Atrapa la División</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Minijuego rápido de selección múltiple para dividir entre 5.</p>
+                    </div>
+                    <div class="bg-red-100 text-red-800 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-red-500 group-hover:text-white transition text-sm">
+                        ¡Jugar Div! 🎮
+                    </div>
+                </div>
+
+                <!-- Mod 7: Resuelve la Aventura -->
+                <div onclick="startModule(7)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-blue-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-blue-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 7</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">🌳</div>
+                        <h3 class="text-lg sm:text-xl font-black text-blue-700 mb-1 sm:mb-2">Resuelve la Aventura</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Problemas de la vida real con el número 5.</p>
+                    </div>
+                    <div class="bg-blue-100 text-blue-700 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-blue-500 group-hover:text-white transition text-sm">
+                        ¡Comenzar Reto! 🎒
+                    </div>
+                </div>
+
+                <!-- Mod 8: JUEGO TIPO CONCÉNTRESE – MULTIPLICACIONES POR 5 (20 Tarjetas / 10 Parejas) -->
+                <div onclick="startModule(8)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-orange-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-orange-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 8</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">🧠</div>
+                        <h3 class="text-lg sm:text-xl font-black text-orange-700 mb-1 sm:mb-2">Concéntrese (20 Tarjetas)</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Memoria con las 10 operaciones y resultados de la tabla del 5.</p>
+                    </div>
+                    <div class="bg-orange-100 text-orange-700 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-orange-500 group-hover:text-white transition text-sm">
+                        ¡Jugar Concéntrese! 🃏
+                    </div>
+                </div>
+
+                <!-- Mod 9: JUEGO TIPO MATCH – DIVISIONES ENTRE 5 (18 Operaciones con Niveles) -->
+                <div onclick="startModule(9)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-amber-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-amber-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 9</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">🔗</div>
+                        <h3 class="text-lg sm:text-xl font-black text-amber-700 mb-1 sm:mb-2">Match Divisiones (18 Ops)</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Relaciona divisiones exactas de dos cifras entre 5 con su resultado.</p>
+                    </div>
+                    <div class="bg-amber-100 text-amber-700 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-amber-500 group-hover:text-white transition text-sm">
+                        ¡Jugar Match! 🧩
+                    </div>
+                </div>
+
+                <!-- Mod 10: Gran Desafío Matemático -->
+                <div onclick="startModule(10)" class="pulse-btn bg-white rounded-3xl p-5 sm:p-6 shadow-xl border-4 border-red-400 cursor-pointer flex flex-col justify-between relative overflow-hidden group col-span-1 sm:col-span-2 lg:col-span-2">
+                    <div class="absolute top-0 right-0 bg-red-400 text-white font-black px-3 py-1 rounded-bl-2xl text-xs sm:text-sm">Módulo 10</div>
+                    <div>
+                        <div class="text-4xl sm:text-5xl mb-2 sm:mb-3">🏆</div>
+                        <h3 class="text-lg sm:text-xl font-black text-red-700 mb-1 sm:mb-2">Gran Desafío Matemático</h3>
+                        <p class="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">Examen final combinado de multiplicaciones y divisiones del 5 con medalla.</p>
+                    </div>
+                    <div class="bg-red-100 text-red-700 font-bold py-2 px-4 rounded-xl text-center group-hover:bg-red-500 group-hover:text-white transition text-sm">
+                        ¡Ganar Diploma! 🎓
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: MÓDULO 1 (TABLA DEL 5 - MULTIPLICACIÓN) -->
+        <div id="screen-mod1" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-orange-400">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-orange-700 text-center">✖️ Tabla del 5</h2>
+                    <div class="w-16"></div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 sm:gap-6 items-center bg-orange-50 border-2 border-orange-200 rounded-3xl p-4 sm:p-6 shadow-inner mb-6">
+                    <div class="flex-1 text-center md:text-left">
+                        <span id="m1-step-badge" class="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Multiplicación 1 de 10</span>
+                        <h3 id="m1-equation" class="text-3xl sm:text-6xl font-black text-orange-800 my-2 sm:my-3">5 × 1 = 5</h3>
+                        <p id="m1-sum-text" class="text-base sm:text-xl font-bold text-gray-600 mb-2 sm:mb-4">¡Multiplicar por 5 es sumar cinco veces el mismo número o contar manos con 5 dedos!</p>
+                    </div>
+
+                    <div class="flex-1 bg-white rounded-2xl p-4 border-2 border-orange-300 shadow-md w-full flex flex-col items-center justify-center min-h-[180px] sm:min-h-[220px]">
+                        <p class="text-xs font-bold text-orange-600 uppercase mb-2">Representación por Grupos de 5</p>
+                        <div id="m1-visual-container" class="flex flex-col gap-2.5 items-center w-full max-w-xs"></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <button onclick="m1Prev()" id="m1-prev-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl shadow transition text-sm sm:text-base">
+                        ⬅️ Anterior
+                    </button>
+                    <div class="flex gap-1" id="m1-dots"></div>
+                    <button onclick="m1Next()" id="m1-next-btn" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl shadow transition text-sm sm:text-base">
+                        Siguiente ➡️
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: MÓDULO 2 (DIVISIÓN ENTRE 5) -->
+        <div id="screen-mod2" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-amber-400">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-amber-700 text-center">➗ Dividir entre 5</h2>
+                    <div class="w-16"></div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 sm:gap-6 items-center bg-amber-50 border-2 border-amber-200 rounded-3xl p-4 sm:p-6 shadow-inner mb-6">
+                    <div class="flex-1 text-center md:text-left">
+                        <span id="m2-step-badge" class="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">División 1 de 10</span>
+                        <h3 id="m2-equation" class="text-3xl sm:text-6xl font-black text-amber-800 my-2 sm:my-3">5 ÷ 5 = 1</h3>
+                        <p id="m2-desc-text" class="text-sm sm:text-lg font-bold text-gray-600 mb-3 sm:mb-4">Repartir en partes iguales entre 5 amigos.</p>
+                        
+                        <div class="bg-white/80 border border-amber-300 rounded-2xl p-2.5 sm:p-3 mb-2 shadow-sm">
+                            <p class="text-xs sm:text-sm font-extrabold text-amber-800">💡 Regla de Oro:</p>
+                            <p id="m2-relation" class="text-xs sm:text-sm font-bold text-gray-700">Dividir entre 5 es lo opuesto a multiplicar por 5.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 bg-white rounded-2xl p-4 border-2 border-amber-300 shadow-md w-full flex flex-col items-center justify-center min-h-[180px] sm:min-h-[220px]">
+                        <p class="text-xs font-bold text-amber-600 uppercase mb-2">Repartición en 5 Partes</p>
+                        <div id="m2-visual-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2 justify-center items-center w-full"></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <button onclick="m2Prev()" id="m2-prev-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl shadow transition text-sm sm:text-base">
+                        ⬅️ Anterior
+                    </button>
+                    <div class="flex gap-1" id="m2-dots"></div>
+                    <button onclick="m2Next()" id="m2-next-btn" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl shadow transition text-sm sm:text-base">
+                        Siguiente ➡️
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: MÓDULO 3 (COMPLETA LA MULTIPLICACIÓN) -->
+        <div id="screen-mod3" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-yellow-400 text-center">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-yellow-700">🧩 Completa Mult</h2>
+                    <span id="m3-score" class="bg-yellow-100 text-yellow-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-yellow-400 text-xs sm:text-sm">Pregunta 1/8</span>
+                </div>
+
+                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-3xl p-5 sm:p-8 mb-6 shadow-inner">
+                    <p class="text-xs sm:text-sm font-bold text-yellow-800 mb-2">¡Encuentra el número faltante!</p>
+                    <div id="m3-question-box" class="text-3xl sm:text-6xl font-black text-yellow-800 my-3 tracking-wider">5 × __ = 25</div>
+                    <div id="m3-feedback" class="text-base sm:text-lg font-bold min-h-[30px] transition-all"></div>
+                </div>
+
+                <div id="m3-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: MÓDULO 4 (COMPLETA LA DIVISIÓN) -->
+        <div id="screen-mod4" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-teal-400 text-center">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-teal-700">🔍 Completa Div</h2>
+                    <span id="m4-score" class="bg-teal-100 text-teal-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-teal-400 text-xs sm:text-sm">Pregunta 1/8</span>
+                </div>
+
+                <div class="bg-teal-50 border-2 border-teal-200 rounded-3xl p-5 sm:p-8 mb-6 shadow-inner">
+                    <p class="text-xs sm:text-sm font-bold text-teal-800 mb-2">¡Encuentra el resultado faltante!</p>
+                    <div id="m4-question-box" class="text-3xl sm:text-6xl font-black text-teal-800 my-3 tracking-wider">30 ÷ 5 = __</div>
+                    <div id="m4-feedback" class="text-base sm:text-lg font-bold min-h-[30px] transition-all"></div>
+                </div>
+
+                <div id="m4-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: MÓDULO 5 (ATRAPA MULTIPLICACIÓN) -->
+        <div id="screen-mod5" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-orange-500 text-center">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-orange-700">⭐ Atrapa Multiplicación</h2>
+                    <div class="flex space-x-2">
+                        <span class="bg-orange-100 text-orange-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-orange-300 text-xs sm:text-sm">Ronda <span id="m5-round">1</span>/8</span>
+                        <span class="bg-amber-100 text-amber-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-amber-300 text-xs sm:text-sm">Pts: <span id="m5-points">0</span></span>
+                    </div>
+                </div>
+
+                <div class="bg-orange-50 border-2 border-orange-200 rounded-3xl p-6 sm:p-8 mb-6 shadow-inner">
+                    <p class="text-xs sm:text-sm font-bold text-orange-800 mb-2">¡Selecciona el resultado correcto!</p>
+                    <div id="m5-target" class="text-4xl sm:text-6xl font-black text-orange-800 my-3">5 × 1 = ?</div>
+                    <div id="m5-feedback" class="text-base sm:text-lg font-bold min-h-[30px]"></div>
+                </div>
+
+                <div id="m5-bubbles" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: MÓDULO 6 (ATRAPA DIVISIÓN) -->
+        <div id="screen-mod6" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-red-400 text-center">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-red-700">💫 Atrapa División</h2>
+                    <div class="flex space-x-2">
+                        <span class="bg-red-100 text-red-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-red-300 text-xs sm:text-sm">Ronda <span id="m6-round">1</span>/8</span>
+                        <span class="bg-amber-100 text-amber-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-amber-300 text-xs sm:text-sm">Pts: <span id="m6-points">0</span></span>
+                    </div>
+                </div>
+
+                <div class="bg-red-50 border-2 border-red-200 rounded-3xl p-6 sm:p-8 mb-6 shadow-inner">
+                    <p class="text-xs sm:text-sm font-bold text-red-800 mb-2">¡Selecciona el resultado correcto!</p>
+                    <div id="m6-target" class="text-4xl sm:text-6xl font-black text-red-800 my-3">25 ÷ 5 = ?</div>
+                    <div id="m6-feedback" class="text-base sm:text-lg font-bold min-h-[30px]"></div>
+                </div>
+
+                <div id="m6-bubbles" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 8: MÓDULO 7 (RESUELVE LA AVENTURA) -->
+        <div id="screen-mod7" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-blue-400 text-center">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-blue-700">🌳 Resuelve la Aventura</h2>
+                    <span id="m7-progress" class="bg-blue-100 text-blue-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-blue-300 text-xs sm:text-sm">Reto 1/4</span>
+                </div>
+
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-3xl p-5 sm:p-8 mb-6 shadow-inner text-center">
+                    <div id="m7-icon" class="text-5xl sm:text-6xl mb-2 bouncing">✋</div>
+                    <h3 id="m7-title" class="text-lg sm:text-2xl font-black text-blue-900 mb-2">Manos Amigas</h3>
+                    <p id="m7-story" class="text-sm sm:text-lg font-bold text-gray-700 mb-4">Vemos 6 niños. Cada niño levanta su mano con 5 dedos abiertos. ¿Cuántos dedos hay en total?</p>
+                    <div id="m7-feedback" class="text-base sm:text-lg font-bold min-h-[30px]"></div>
+                </div>
+
+                <div id="m7-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 9: MÓDULO 8 (JUEGO TIPO CONCÉNTRESE – 20 TARJETAS / 10 PAREJAS) -->
+        <div id="screen-mod8" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-5xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-orange-400 text-center">
+                <div class="flex flex-wrap justify-between items-center mb-4 sm:mb-6 gap-2">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-orange-700">🧠 Concéntrese (20 Tarjetas)</h2>
+                    <div class="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm font-bold">
+                        <span id="m8-moves" class="bg-orange-100 text-orange-800 px-3 py-1.5 rounded-2xl border-2 border-orange-300">Movs: 0</span>
+                        <span id="m8-timer" class="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-2xl border-2 border-amber-300">⏱️ 00:00</span>
+                        <span id="m8-pairs" class="bg-green-100 text-green-800 px-3 py-1.5 rounded-2xl border-2 border-green-300">Parejas: 0/10</span>
+                    </div>
+                </div>
+
+                <div class="bg-orange-50 border-2 border-orange-200 rounded-3xl p-4 sm:p-6 mb-4 shadow-inner">
+                    <p class="text-xs sm:text-sm font-bold text-orange-800 mb-3">¡Encuentra las 10 parejas de operaciones y resultados de la tabla del 5!</p>
+                    
+                    <div class="flex justify-center gap-3 mb-4">
+                        <button onclick="initMod8()" class="bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold px-4 py-2 rounded-xl shadow transition text-sm">
+                            🔄 Reiniciar Partida
+                        </button>
+                        <button onclick="shuffleMemoryCards()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2 rounded-xl shadow transition text-sm">
+                            🔀 Mezclar Tarjetas
+                        </button>
+                    </div>
+
+                    <div id="memory-grid" class="grid grid-cols-4 sm:grid-cols-5 gap-2.5 sm:gap-4 max-w-4xl mx-auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 10: MÓDULO 9 (JUEGO TIPO MATCH – DIVISIONES ENTRE 5 CON 18 OPERACIONES Y NIVELES) -->
+        <div id="screen-mod9" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-5xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-amber-400 text-center">
+                <div class="flex flex-wrap justify-between items-center mb-4 sm:mb-6 gap-2">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-amber-700">🔗 Match Divisiones (18 Ops)</h2>
+                    <div class="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm font-bold">
+                        <span id="m9-timer" class="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-2xl border-2 border-amber-300">⏱️ 00:00</span>
+                        <span id="m9-score" class="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-2xl border-2 border-amber-300">Aciertos: 0/5</span>
+                    </div>
+                </div>
+
+                <!-- Selector de Dificultad -->
+                <div id="match-difficulty-panel" class="bg-amber-50 border-2 border-amber-200 rounded-3xl p-6 sm:p-8 mb-6 shadow-inner">
+                    <h3 class="text-xl sm:text-2xl font-black text-amber-800 mb-2">¡Elige tu Nivel de Dificultad!</h3>
+                    <p class="text-gray-600 text-sm sm:text-base font-bold mb-6">Banco de 18 divisiones exactas de dos cifras entre 5 (10 ÷ 5 hasta 95 ÷ 5).</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                        <button onclick="setMatchDifficulty('easy')" class="pulse-btn bg-white hover:bg-amber-100 border-4 border-amber-300 p-5 rounded-3xl shadow-md flex flex-col items-center">
+                            <span class="text-3xl mb-2">🟢</span>
+                            <h4 class="font-black text-amber-800 text-lg">Fácil</h4>
+                            <p class="text-xs text-gray-500 font-bold">5 parejas por ronda</p>
+                        </button>
+                        <button onclick="setMatchDifficulty('medium')" class="pulse-btn bg-white hover:bg-amber-100 border-4 border-amber-400 p-5 rounded-3xl shadow-md flex flex-col items-center">
+                            <span class="text-3xl mb-2">🟡</span>
+                            <h4 class="font-black text-amber-800 text-lg">Intermedio</h4>
+                            <p class="text-xs text-gray-500 font-bold">10 parejas por ronda</p>
+                        </button>
+                        <button onclick="setMatchDifficulty('hard')" class="pulse-btn bg-white hover:bg-amber-100 border-4 border-amber-500 p-5 rounded-3xl shadow-md flex flex-col items-center">
+                            <span class="text-3xl mb-2">🔴</span>
+                            <h4 class="font-black text-amber-800 text-lg">Avanzado</h4>
+                            <p class="text-xs text-gray-500 font-bold">18 parejas por ronda</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Área del Juego Match -->
+                <div id="match-game-panel" class="hidden bg-amber-50 border-2 border-amber-200 rounded-3xl p-4 sm:p-6 mb-4 shadow-inner">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="resetMatchGame()" class="bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold px-4 py-2 rounded-xl shadow transition text-sm">
+                            🔄 Reiniciar Ronda
+                        </button>
+                        <button onclick="newMatchRound()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2 rounded-xl shadow transition text-sm">
+                            🔀 Nueva Ronda Aleatoria
+                        </button>
+                    </div>
+                    <p class="text-xs sm:text-sm font-bold text-amber-800 mb-4">Selecciona primero una división a la izquierda y luego su resultado correcto a la derecha.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                        <div id="match-left" class="flex flex-col gap-3"></div>
+                        <div id="match-right" class="flex flex-col gap-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 11: MÓDULO 10 (GRAN DESAFÍO MATEMÁTICO) -->
+        <div id="screen-mod10" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-red-400 text-center">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Salir</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-red-700">🏆 Gran Desafío</h2>
+                    <span id="m10-counter" class="bg-red-100 text-red-800 font-bold px-3 py-1.5 rounded-2xl border-2 border-red-300 text-xs sm:text-sm">Pregunta 1/10</span>
+                </div>
+
+                <div class="bg-red-50 border-2 border-red-200 rounded-3xl p-6 sm:p-8 mb-6 shadow-inner">
+                    <div id="m10-question" class="text-3xl sm:text-6xl font-black text-red-800 my-3">5 × 7 = ?</div>
+                    <div id="m10-feedback" class="text-base sm:text-lg font-bold min-h-[30px]"></div>
+                </div>
+
+                <div id="m10-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 11.1: PANTALLA Y DIPLOMA OFICIAL DE EXCELENCIA EN PDF -->
+        <div id="screen-diploma-celebration" class="screen hidden w-full flex flex-col items-center animate-fade py-4">
+            <div id="diploma-print-target" class="print-diploma-box bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border-8 border-orange-500 max-w-4xl w-full text-center relative overflow-hidden">
+                <div class="absolute top-4 left-4 text-4xl">⭐</div>
+                <div class="absolute top-4 right-4 text-4xl">🌟</div>
+                <div class="absolute bottom-4 left-4 text-4xl">🏆</div>
+                <div class="absolute bottom-4 right-4 text-4xl">🎖️</div>
+
+                <p id="diploma-subtitle" class="text-xs sm:text-sm font-extrabold text-orange-600 uppercase tracking-widest mb-1">La Aventura del Número 5 – Aplicación Educativa</p>
+                <h2 id="diploma-main-title" class="text-2xl sm:text-4xl font-black text-orange-800 tracking-wide mb-2 uppercase">Diploma de Excelencia Matemática</h2>
+                <p id="diploma-recognition" class="text-xs sm:text-sm font-bold text-gray-500 italic mb-4">Reconocimiento oficial: «CAMPEÓN DE LAS MATEMÁTICAS»</p>
+
+                <p class="text-sm sm:text-base font-bold text-gray-700 mb-2">Se otorga el presente reconocimiento a:</p>
+                
+                <h3 id="diploma-student-name" class="text-3xl sm:text-5xl font-black text-orange-700 my-3 underline decoration-yellow-400 decoration-wavy">Estudiante</h3>
+
+                <p id="diploma-description" class="text-xs sm:text-base font-bold text-gray-600 max-w-2xl mx-auto mb-6 leading-relaxed">
+                    Por haber completado satisfactoriamente los desafíos de aprendizaje de la tabla de multiplicar del 5 y las divisiones entre 5, demostrando entusiasmo, dedicación y perseverancia.
+                </p>
+
+                <div class="bg-yellow-100 border-2 border-yellow-400 rounded-2xl p-3 max-w-lg mx-auto mb-6 shadow-inner">
+                    <p class="text-yellow-900 font-black text-sm sm:text-base">«¡Las matemáticas son una aventura y tú eres un gran campeón!»</p>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-end mt-8 border-t-2 border-dashed border-gray-300 pt-4 px-4 text-left">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">Fecha de finalización:</p>
+                        <p id="diploma-date" class="font-black text-orange-800 text-sm">01 de Noviembre de 2026</p>
+                    </div>
+                    <div class="text-center my-2 sm:my-0">
+                        <div class="inline-block bg-orange-100 border-2 border-orange-400 rounded-full p-3 text-2xl mb-1">🏆</div>
+                        <p class="text-[10px] font-black text-orange-800 uppercase">Sello de Logro</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="border-b-2 border-gray-400 w-36 mb-1"></div>
+                        <p class="text-xs font-bold text-gray-500">Firma del Docente / Responsable</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción (Ocultos al imprimir PDF) -->
+            <div class="flex gap-4 mt-6 no-print">
+                <button onclick="downloadPDFDiploma()" class="bg-orange-600 hover:bg-orange-700 text-white font-black px-6 py-3 rounded-2xl shadow transition">
+                    📥 Descargar PDF 📄
+                </button>
+                <button onclick="showScreen('home')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-6 py-3 rounded-2xl shadow transition">
+                    ⬅️ Volver al Menú
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 11.2: MI GALERÍA DE DIPLOMAS -->
+        <div id="screen-diploma-gallery" class="screen hidden w-full flex flex-col items-center animate-fade py-4">
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-orange-400 max-w-5xl w-full text-center">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-orange-700">🏆 Mi Galería de Diplomas</h2>
+                    <div class="w-16"></div>
+                </div>
+
+                <!-- Indicador de Progreso General -->
+                <div class="bg-orange-50 border-2 border-orange-300 rounded-3xl p-5 mb-6 shadow-inner text-center">
+                    <h3 id="gallery-progress-title" class="text-lg sm:text-xl font-black text-orange-800 mb-1">0 de 4 diplomas obtenidos</h3>
+                    <p id="gallery-progress-msg" class="text-xs sm:text-sm font-bold text-gray-600 mb-3">¡Completa los módulos 7, 8, 9 y 10 para llenar tu galería de campeones!</p>
+                    <div class="w-full bg-gray-200 h-4 rounded-full overflow-hidden border border-orange-200 mb-4">
+                        <div id="gallery-progress-bar" class="bg-orange-600 h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <button onclick="downloadAllDiplomas()" class="pulse-btn bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-black px-6 py-3 rounded-2xl shadow-lg border-2 border-orange-400 text-sm sm:text-base">
+                        📦 Descargar Todos Mis Diplomas (ZIP / Paquete)
+                    </button>
+                </div>
+
+                <!-- Cuadrícula de Tarjetas de Diplomas (Módulos 7, 8, 9 y 10) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" id="gallery-cards-grid">
+                    <!-- Generado dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 12: TIENDA DE ACCESORIOS Y MASCOTAS -->
+        <div id="screen-shop" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-yellow-400">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-orange-700">🎒 Tienda Foxy</h2>
+                    <div class="flex items-center bg-amber-100 border-2 border-amber-400 px-3 py-1.5 rounded-2xl font-black text-amber-800 text-xs sm:text-base">
+                        <span>🪙 <span id="shop-coins">0</span></span>
+                    </div>
+                </div>
+
+                <p class="text-gray-600 text-center mb-5 text-sm sm:text-base font-bold">¡Usa tus monedas ganadas para desbloquear sombreros y accesorios geniales!</p>
+                <div id="shop-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 13: ESTADÍSTICAS Y PROGRESO -->
+        <div id="screen-stats" class="screen hidden w-full flex flex-col items-center">
+            <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-teal-400">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-2xl border-2 border-gray-300 transition flex items-center space-x-1 text-sm">
+                        <span>⬅️</span><span>Volver</span>
+                    </button>
+                    <h2 class="text-xl sm:text-3xl font-black text-teal-700">📊 Tu Progreso</h2>
+                    <div class="w-16"></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                    <div class="bg-yellow-50 border-2 border-yellow-300 rounded-3xl p-5 text-center shadow-inner">
+                        <span class="text-3xl sm:text-4xl">⭐</span>
+                        <h4 class="text-gray-500 font-bold mt-1 sm:mt-2 text-sm">Estrellas</h4>
+                        <p id="stat-stars" class="text-2xl sm:text-3xl font-black text-yellow-600">0</p>
+                    </div>
+                    <div class="bg-amber-50 border-2 border-amber-300 rounded-3xl p-5 text-center shadow-inner">
+                        <span class="text-3xl sm:text-4xl">🪙</span>
+                        <h4 class="text-gray-500 font-bold mt-1 sm:mt-2 text-sm">Monedas</h4>
+                        <p id="stat-coins" class="text-2xl sm:text-3xl font-black text-amber-600">0</p>
+                    </div>
+                    <div class="bg-orange-50 border-2 border-orange-300 rounded-3xl p-5 text-center shadow-inner">
+                        <span class="text-3xl sm:text-4xl">🏆</span>
+                        <h4 class="text-gray-500 font-bold mt-1 sm:mt-2 text-sm">Medallas</h4>
+                        <p id="stat-medals" class="text-2xl sm:text-3xl font-black text-orange-600">0</p>
+                    </div>
+                </div>
+
+                <h3 class="text-lg sm:text-xl font-black text-teal-700 mb-3">🏅 Insignias de Explorador</h3>
+                <div id="badges-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white/80 backdrop-blur-md py-3 px-4 text-center text-xs sm:text-sm font-bold text-orange-900 border-t-2 border-orange-200 no-print">
+        ✨ La Aventura del Número 5 - Multiplicación y División para Niños ✨
+    </footer>
+
+    <!-- MODAL DE VICTORIA / RESULTADO DE MÓDULO -->
+    <div id="modal-victory" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 animate-fade no-print">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center border-4 border-yellow-400 shadow-2xl relative">
+            <div class="text-5xl sm:text-6xl mb-3 bouncing">🎉</div>
+            <h3 id="modal-title" class="text-2xl sm:text-3xl font-black text-orange-700 mb-2">¡Excelente Trabajo!</h3>
+            <p id="modal-desc" class="text-gray-600 text-sm sm:text-base font-bold mb-6">¡Has completado la misión con gran éxito!</p>
+            <div id="modal-rewards" class="flex justify-center space-x-4 mb-6"></div>
+            <button onclick="closeModalAndHome()" class="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-black py-3 sm:py-3.5 rounded-2xl shadow-lg transition text-base sm:text-lg">
+                ¡Genial, Volver al Menú! 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT GAME LOGIC -->
+    <script>
+        // --- GAME STATE ---
+        let gameState = {
+            studentName: localStorage.getItem('av5_student_name') || '',
+            stars: parseInt(localStorage.getItem('av5_stars')) || 0,
+            coins: parseInt(localStorage.getItem('av5_coins')) || 10,
+            medals: parseInt(localStorage.getItem('av5_medals')) || 0,
+            audioEnabled: true,
+            unlockedAccessories: JSON.parse(localStorage.getItem('av5_acc')) || ['base'],
+            activeAccessory: localStorage.getItem('av5_active_acc') || 'base',
+            modulesCompleted: JSON.parse(localStorage.getItem('av5_mods')) || [false, false, false, false, false, false, false, false, false, false],
+            diplomasData: JSON.parse(localStorage.getItem('av5_diplomas')) || {}
+        };
+
+        function saveState() {
+            localStorage.setItem('av5_student_name', gameState.studentName);
+            localStorage.setItem('av5_stars', gameState.stars);
+            localStorage.setItem('av5_coins', gameState.coins);
+            localStorage.setItem('av5_medals', gameState.medals);
+            localStorage.setItem('av5_acc', JSON.stringify(gameState.unlockedAccessories));
+            localStorage.setItem('av5_active_acc', gameState.activeAccessory);
+            localStorage.setItem('av5_mods', JSON.stringify(gameState.modulesCompleted));
+            localStorage.setItem('av5_diplomas', JSON.stringify(gameState.diplomasData));
+            updateHUD();
+        }
+
+        function updateHUD() {
+            const starsEl = document.getElementById('hud-stars');
+            const coinsEl = document.getElementById('hud-coins');
+            const medalsEl = document.getElementById('hud-medals');
+            const shopCoinsEl = document.getElementById('shop-coins');
+            const statStarsEl = document.getElementById('stat-stars');
+            const statCoinsEl = document.getElementById('stat-coins');
+            const statMedalsEl = document.getElementById('stat-medals');
+
+            if (starsEl) starsEl.innerText = gameState.stars;
+            if (coinsEl) coinsEl.innerText = gameState.coins;
+            if (medalsEl) medalsEl.innerText = gameState.medals;
+            if (shopCoinsEl) shopCoinsEl.innerText = gameState.coins;
+            if (statStarsEl) statStarsEl.innerText = gameState.stars;
+            if (statCoinsEl) statCoinsEl.innerText = gameState.coins;
+            if (statMedalsEl) statMedalsEl.innerText = gameState.medals;
+
+            const studentNameDisplays = document.querySelectorAll('.student-name-display');
+            studentNameDisplays.forEach(el => {
+                el.innerText = gameState.studentName || 'Estudiante';
+            });
+        }
+
+        function checkAndGrantDiploma(modNum) {
+            if (!gameState.diplomasData[modNum]) {
+                const now = new Date();
+                const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+                gameState.diplomasData[modNum] = now.toLocaleDateString('es-ES', optionsDate);
+                saveState();
+            }
+        }
+
+        // --- ULTRA-REALISTIC WEB AUDIO API SYNTHESIZER ---
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!gameState.audioEnabled) return;
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
+
+                if (type === 'correct') {
+                    const frequencies = [523.25, 659.25, 783.99, 1046.50];
+                    frequencies.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        
+                        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + (idx * 0.08));
+                        
+                        gain.gain.setValueAtTime(0, now + (idx * 0.08));
+                        gain.gain.linearRampToValueAtTime(0.2, now + (idx * 0.08) + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.08) + 0.5);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now + (idx * 0.08));
+                        osc.stop(now + (idx * 0.08) + 0.5);
+                    });
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(160, now + 0.25);
+                    
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'coin') {
+                    [987.77, 1318.51].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + (idx * 0.06));
+                        
+                        gain.gain.setValueAtTime(0.2, now + (idx * 0.06));
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.06) + 0.3);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now + (idx * 0.06));
+                        osc.stop(now + (idx * 0.06) + 0.3);
+                    });
+                } else if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.04);
+                    
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                } else if (type === 'win') {
+                    const fanfareNotes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+                    fanfareNotes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + (idx * 0.09));
+                        
+                        const duration = idx === fanfareNotes.length - 1 ? 0.8 : 0.2;
+                        gain.gain.setValueAtTime(0.25, now + (idx * 0.09));
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.09) + duration);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now + (idx * 0.09));
+                        osc.stop(now + (idx * 0.09) + duration);
+                    });
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+
+        function toggleAudio() {
+            gameState.audioEnabled = !gameState.audioEnabled;
+            const audioBtn = document.getElementById('audio-btn');
+            if (audioBtn) audioBtn.innerText = gameState.audioEnabled ? '🔊' : '🔇';
+            playSound('click');
+        }
+
+        // --- TIMER UTILITY ---
+        let globalTimerInterval = null;
+        let globalSeconds = 0;
+
+        function startGlobalTimer(timerElementId) {
+            clearInterval(globalTimerInterval);
+            globalSeconds = 0;
+            updateTimerDisplay(timerElementId);
+            globalTimerInterval = setInterval(() => {
+                globalSeconds++;
+                updateTimerDisplay(timerElementId);
+            }, 1000);
+        }
+
+        function stopGlobalTimer() {
+            clearInterval(globalTimerInterval);
+        }
+
+        function updateTimerDisplay(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const mins = Math.floor(globalSeconds / 60).toString().padStart(2, '0');
+            const secs = (globalSeconds % 60).toString().padStart(2, '0');
+            el.innerText = `⏱️ ${mins}:${secs}`;
+        }
+
+        // --- REGISTRATION & WELCOME FLOW ---
+        function handleRegisterStudent() {
+            const input = document.getElementById('student-name-input');
+            const name = input ? input.value.trim() : '';
+            const errorEl = document.getElementById('register-error');
+
+            if (!name) {
+                playSound('wrong');
+                if (errorEl) errorEl.innerText = "¡Por favor escribe tu nombre para continuar!";
+                return;
+            }
+
+            if (errorEl) errorEl.innerText = "";
+            gameState.studentName = name;
+            saveState();
+            playSound('correct');
+
+            const welcomeGreetingText = document.getElementById('welcome-greeting-text');
+            if (welcomeGreetingText) {
+                welcomeGreetingText.innerHTML = `¡Hola, <strong>${name}</strong>! ¡Qué alegría tenerte aquí!<br><br>Hoy tienes una misión muy especial: convertirte en un campeón de las matemáticas.<br>Vamos a divertirnos aprendiendo la tabla del 5, resolviendo divisiones y superando emocionantes desafíos.<br><br>¡Prepárate para jugar, aprender y ganar muchas estrellas!<br>¿Estás listo para comenzar?`;
+            }
+            showScreen('welcome-greeting');
+        }
+
+        function openProfileSettings() {
+            playSound('click');
+            const input = document.getElementById('settings-name-input');
+            if (input) input.value = gameState.studentName;
+            showScreen('profile');
+        }
+
+        function saveProfileSettings() {
+            playSound('click');
+            const input = document.getElementById('settings-name-input');
+            const name = input ? input.value.trim() : '';
+            const errorEl = document.getElementById('settings-error');
+
+            if (!name) {
+                if (errorEl) errorEl.innerText = "El nombre no puede estar vacío.";
+                return;
+            }
+
+            gameState.studentName = name;
+            saveState();
+            if (errorEl) errorEl.innerText = "¡Nombre actualizado con éxito! ✔️";
+            setTimeout(() => {
+                showScreen('home');
+            }, 1000);
+        }
+
+        function logoutStudent() {
+            playSound('click');
+            if (confirm("¿Estás seguro de que deseas cerrar sesión? Tu nombre guardado será borrado.")) {
+                gameState.studentName = '';
+                saveState();
+                const nameInput = document.getElementById('student-name-input');
+                if (nameInput) nameInput.value = '';
+                const regError = document.getElementById('register-error');
+                if (regError) regError.innerText = '';
+                showScreen('register');
+            }
+        }
+
+        // --- NAVIGATION & SCREENS ---
+        function showScreen(screenId) {
+            playSound('click');
+            stopGlobalTimer();
+            document.querySelectorAll('.screen').forEach(el => el.classList.add('hidden'));
+            const targetScreen = document.getElementById('screen-' + screenId);
+            if (targetScreen) targetScreen.classList.remove('hidden');
+            window.scrollTo(0, 0);
+
+            if (screenId === 'shop') renderShop();
+            if (screenId === 'stats') renderStats();
+        }
+
+        function startModule(modNum) {
+            playSound('click');
+            if (modNum === 1) initMod1();
+            if (modNum === 2) initMod2();
+            if (modNum === 3) initMod3();
+            if (modNum === 4) initMod4();
+            if (modNum === 5) initMod5();
+            if (modNum === 6) initMod6();
+            if (modNum === 7) initMod7();
+            if (modNum === 8) initMod8();
+            if (modNum === 9) initMod9();
+            if (modNum === 10) initMod10();
+        }
+
+        // --- MÓDULO 1: LA TABLA DEL 5 (MULTIPLICACIÓN) ---
+        let m1Index = 0;
+        const m1Data = [
+            { mult: "5 × 1 = 5", desc: "1 grupo de 5 es 5" },
+            { mult: "5 × 2 = 10", desc: "2 grupos de 5 es 10" },
+            { mult: "5 × 3 = 15", desc: "3 grupos de 5 es 15" },
+            { mult: "5 × 4 = 20", desc: "4 grupos de 5 es 20" },
+            { mult: "5 × 5 = 25", desc: "5 grupos de 5 es 25" },
+            { mult: "5 × 6 = 30", desc: "6 grupos de 5 es 30" },
+            { mult: "5 × 7 = 35", desc: "7 grupos de 5 es 35" },
+            { mult: "5 × 8 = 40", desc: "8 grupos de 5 es 40" },
+            { mult: "5 × 9 = 45", desc: "9 grupos de 5 es 45" },
+            { mult: "5 × 10 = 50", desc: "10 grupos de 5 es 50" }
+        ];
+
+        function initMod1() {
+            m1Index = 0;
+            renderMod1();
+            showScreen('mod1');
+        }
+
+        function renderMod1() {
+            const data = m1Data[m1Index];
+            document.getElementById('m1-step-badge').innerText = `Multiplicación ${m1Index + 1} de 10`;
+            document.getElementById('m1-equation').innerText = data.mult;
+            document.getElementById('m1-sum-text').innerText = data.desc;
+            
+            const container = document.getElementById('m1-visual-container');
+            container.innerHTML = '';
+            
+            const count = m1Index + 1;
+            for (let g = 0; g < count; g++) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'flex gap-1 bg-orange-100 p-2 rounded-xl border border-orange-300 shadow-sm items-center justify-center';
+                for (let i = 0; i < 5; i++) {
+                    const icon = document.createElement('span');
+                    icon.className = 'text-base sm:text-xl bouncing';
+                    icon.innerText = g % 2 === 0 ? '⭐' : '🍏';
+                    groupDiv.appendChild(icon);
+                }
+                container.appendChild(groupDiv);
+            }
+
+            const dots = document.getElementById('m1-dots');
+            dots.innerHTML = '';
+            m1Data.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${idx === m1Index ? 'bg-orange-600 scale-125' : 'bg-gray-300'} transition`;
+                dots.appendChild(dot);
+            });
+
+            const prevBtn = document.getElementById('m1-prev-btn');
+            if (prevBtn) {
+                prevBtn.disabled = m1Index === 0;
+                prevBtn.classList.toggle('opacity-50', m1Index === 0);
+            }
+        }
+
+        function m1Next() {
+            playSound('click');
+            if (m1Index < m1Data.length - 1) {
+                m1Index++;
+                renderMod1();
+            } else {
+                gameState.stars += 5;
+                gameState.coins += 10;
+                gameState.modulesCompleted[0] = true;
+                saveState();
+                showVictoryModal("¡Módulo 1 Completado!", `¡${gameState.studentName}, has aprendido toda la tabla del 5!`, 5, 10);
+            }
+        }
+
+        function m1Prev() {
+            playSound('click');
+            if (m1Index > 0) {
+                m1Index--;
+                renderMod1();
+            }
+        }
+
+        // --- MÓDULO 2: DIVIDIR ENTRE 5 ---
+        let m2Index = 0;
+        const m2Data = [
+            { div: "5 ÷ 5 = 1", total: 5, each: 1 },
+            { div: "10 ÷ 5 = 2", total: 10, each: 2 },
+            { div: "15 ÷ 5 = 3", total: 15, each: 3 },
+            { div: "20 ÷ 5 = 4", total: 20, each: 4 },
+            { div: "25 ÷ 5 = 5", total: 25, each: 5 },
+            { div: "30 ÷ 5 = 6", total: 30, each: 6 },
+            { div: "35 ÷ 5 = 7", total: 35, each: 7 },
+            { div: "40 ÷ 5 = 8", total: 40, each: 8 },
+            { div: "45 ÷ 5 = 9", total: 45, each: 9 },
+            { div: "50 ÷ 5 = 10", total: 50, each: 10 }
+        ];
+
+        function initMod2() {
+            m2Index = 0;
+            renderMod2();
+            showScreen('mod2');
+        }
+
+        function renderMod2() {
+            const data = m2Data[m2Index];
+            document.getElementById('m2-step-badge').innerText = `División ${m2Index + 1} de 10`;
+            document.getElementById('m2-equation').innerText = data.div;
+            document.getElementById('m2-desc-text').innerText = `Repartir ${data.total} objetos equitativamente entre 5 amigos.`;
+            document.getElementById('m2-relation').innerText = `Dividir entre 5 es repartir en 5 grupos iguales.`;
+
+            const container = document.getElementById('m2-visual-container');
+            container.innerHTML = '';
+            
+            const characters = ['🦊 Foxy', '🐰 Lory', '🐼 Pandy', '🐨 Koko', '🦁 Leo'];
+            characters.forEach((charName) => {
+                const box = document.createElement('div');
+                box.className = 'bg-amber-100 border-2 border-amber-300 rounded-2xl p-2.5 flex flex-col items-center flex-1 shadow-sm';
+                
+                const title = document.createElement('span');
+                title.className = 'text-[10px] sm:text-xs font-bold text-amber-800 mb-1';
+                title.innerText = charName;
+                box.appendChild(title);
+
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = 'flex flex-wrap gap-1 justify-center max-w-[100px]';
+                for (let i = 0; i < data.each; i++) {
+                    const item = document.createElement('span');
+                    item.className = 'text-base sm:text-lg bouncing';
+                    item.innerText = '🍰';
+                    itemsDiv.appendChild(item);
+                }
+                box.appendChild(itemsDiv);
+                container.appendChild(box);
+            });
+
+            const dots = document.getElementById('m2-dots');
+            dots.innerHTML = '';
+            m2Data.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${idx === m2Index ? 'bg-amber-600 scale-125' : 'bg-gray-300'} transition`;
+                dots.appendChild(dot);
+            });
+
+            const prevBtn = document.getElementById('m2-prev-btn');
+            if (prevBtn) {
+                prevBtn.disabled = m2Index === 0;
+                prevBtn.classList.toggle('opacity-50', m2Index === 0);
+            }
+        }
+
+        function m2Next() {
+            playSound('click');
+            if (m2Index < m2Data.length - 1) {
+                m2Index++;
+                renderMod2();
+            } else {
+                gameState.stars += 5;
+                gameState.coins += 10;
+                gameState.modulesCompleted[1] = true;
+                saveState();
+                showVictoryModal("¡Módulo 2 Completado!", `¡${gameState.studentName}, ya sabes dividir entre 5 perfectamente!`, 5, 10);
+            }
+        }
+
+        function m2Prev() {
+            playSound('click');
+            if (m2Index > 0) {
+                m2Index--;
+                renderMod2();
+            }
+        }
+
+        // --- MÓDULO 3: COMPLETA LA MULTIPLICACIÓN ---
+        let m3Questions = [];
+        let m3Current = 0;
+        let m3CorrectCount = 0;
+
+        function initMod3() {
+            m3Current = 0;
+            m3CorrectCount = 0;
+            m3Questions = [
+                { q: "5 × __ = 25", ans: 5, options: [4, 5, 6, 7] },
+                { q: "5 × __ = 35", ans: 7, options: [6, 7, 8, 9] },
+                { q: "__ × 5 = 45", ans: 9, options: [7, 8, 9, 10] },
+                { q: "5 × __ = 20", ans: 4, options: [3, 4, 5, 6] },
+                { q: "__ × 5 = 30", ans: 6, options: [4, 5, 6, 7] },
+                { q: "5 × __ = 40", ans: 8, options: [7, 8, 9, 6] },
+                { q: "__ × 5 = 15", ans: 3, options: [2, 3, 4, 5] },
+                { q: "5 × __ = 50", ans: 10, options: [8, 9, 10, 7] }
+            ];
+            renderMod3();
+            showScreen('mod3');
+        }
+
+        function renderMod3() {
+            if (m3Current >= m3Questions.length) {
+                gameState.stars += 6;
+                gameState.coins += 15;
+                gameState.modulesCompleted[2] = true;
+                saveState();
+                showVictoryModal("¡Módulo 3 Superado!", `¡${gameState.studentName}, completaste las multiplicaciones con ${m3CorrectCount} aciertos!`, 6, 15);
+                return;
+            }
+
+            const item = m3Questions[m3Current];
+            document.getElementById('m3-score').innerText = `Pregunta ${m3Current + 1}/${m3Questions.length}`;
+            document.getElementById('m3-question-box').innerText = item.q;
+            document.getElementById('m3-feedback').innerText = '';
+
+            const optionsContainer = document.getElementById('m3-options');
+            optionsContainer.innerHTML = '';
+            
+            const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'pulse-btn bg-white hover:bg-yellow-100 text-yellow-800 text-xl sm:text-2xl font-black py-3 sm:py-4 rounded-2xl shadow-lg border-2 border-yellow-400 transition';
+                btn.innerText = opt;
+                btn.onclick = () => checkM3(opt, item.ans);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkM3(selected, correct) {
+            const feedback = document.getElementById('m3-feedback');
+            const buttons = document.querySelectorAll('#m3-options button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                playSound('correct');
+                feedback.innerText = "¡Correcto! 🎉 (Saltando...)";
+                feedback.className = "text-base sm:text-lg font-bold text-green-600 min-h-[30px]";
+                m3CorrectCount++;
+            } else {
+                playSound('wrong');
+                feedback.innerText = `¡Incorrecto! Era ${correct}. (Saltando...)`;
+                feedback.className = "text-base sm:text-lg font-bold text-red-500 min-h-[30px]";
+            }
+
+            setTimeout(() => {
+                m3Current++;
+                renderMod3();
+            }, 1100);
+        }
+
+        // --- MÓDULO 4: COMPLETA LA DIVISIÓN ---
+        let m4Questions = [];
+        let m4Current = 0;
+        let m4CorrectCount = 0;
+
+        function initMod4() {
+            m4Current = 0;
+            m4CorrectCount = 0;
+            m4Questions = [
+                { q: "30 ÷ 5 = __", ans: 6, options: [5, 6, 7, 8] },
+                { q: "40 ÷ 5 = __", ans: 8, options: [6, 7, 8, 9] },
+                { q: "50 ÷ 5 = __", ans: 10, options: [9, 10, 8, 7] },
+                { q: "20 ÷ 5 = __", ans: 4, options: [3, 4, 5, 6] },
+                { q: "15 ÷ 5 = __", ans: 3, options: [2, 3, 4, 5] },
+                { q: "35 ÷ 5 = __", ans: 7, options: [6, 7, 8, 9] },
+                { q: "25 ÷ 5 = __", ans: 5, options: [4, 5, 6, 3] },
+                { q: "45 ÷ 5 = __", ans: 9, options: [7, 8, 9, 10] }
+            ];
+            renderMod4();
+            showScreen('mod4');
+        }
+
+        function renderMod4() {
+            if (m4Current >= m4Questions.length) {
+                gameState.stars += 6;
+                gameState.coins += 15;
+                gameState.modulesCompleted[3] = true;
+                saveState();
+                showVictoryModal("¡Módulo 4 Superado!", `¡${gameState.studentName}, completaste las divisiones con ${m4CorrectCount} aciertos!`, 6, 15);
+                return;
+            }
+
+            const item = m4Questions[m4Current];
+            document.getElementById('m4-score').innerText = `Pregunta ${m4Current + 1}/${m4Questions.length}`;
+            document.getElementById('m4-question-box').innerText = item.q;
+            document.getElementById('m4-feedback').innerText = '';
+
+            const optionsContainer = document.getElementById('m4-options');
+            optionsContainer.innerHTML = '';
+            
+            const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'pulse-btn bg-white hover:bg-teal-100 text-teal-800 text-xl sm:text-2xl font-black py-3 sm:py-4 rounded-2xl shadow-lg border-2 border-teal-400 transition';
+                btn.innerText = opt;
+                btn.onclick = () => checkM4(opt, item.ans);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkM4(selected, correct) {
+            const feedback = document.getElementById('m4-feedback');
+            const buttons = document.querySelectorAll('#m4-options button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                playSound('correct');
+                feedback.innerText = "¡Correcto! 🎉 (Saltando...)";
+                feedback.className = "text-base sm:text-lg font-bold text-green-600 min-h-[30px]";
+                m4CorrectCount++;
+            } else {
+                playSound('wrong');
+                feedback.innerText = `¡Incorrecto! Era ${correct}. (Saltando...)`;
+                feedback.className = "text-base sm:text-lg font-bold text-red-500 min-h-[30px]";
+            }
+
+            setTimeout(() => {
+                m4Current++;
+                renderMod4();
+            }, 1100);
+        }
+
+        // --- MÓDULO 5: ATRAPA MULTIPLICACIÓN ---
+        let m5Round = 1;
+        let m5Points = 0;
+
+        function initMod5() {
+            m5Round = 1;
+            m5Points = 0;
+            nextM5Round();
+            showScreen('mod5');
+        }
+
+        function nextM5Round() {
+            if (m5Round > 8) {
+                gameState.stars += 8;
+                gameState.coins += 20;
+                gameState.modulesCompleted[4] = true;
+                saveState();
+                showVictoryModal("¡Minijuego Superado!", `¡${gameState.studentName}, atrapaste las multiplicaciones con ${m5Points} puntos!`, 8, 20);
+                return;
+            }
+
+            document.getElementById('m5-round').innerText = m5Round;
+            document.getElementById('m5-points').innerText = m5Points;
+            document.getElementById('m5-feedback').innerText = '';
+
+            const n = Math.floor(Math.random() * 10) + 1;
+            const qStr = `5 × ${n} = ?`;
+            const correctAns = 5 * n;
+
+            document.getElementById('m5-target').innerText = qStr;
+
+            let options = [correctAns];
+            while (options.length < 4) {
+                let wrong = correctAns + (Math.floor(Math.random() * 6) - 3);
+                if (wrong > 0 && !options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('m5-bubbles');
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'pulse-btn bg-gradient-to-br from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white text-2xl sm:text-3xl font-black py-4 sm:py-6 rounded-3xl shadow-lg border-2 border-orange-300 transition bouncing';
+                btn.innerText = opt;
+                btn.onclick = () => checkM5(opt, correctAns);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkM5(selected, correct) {
+            const feedback = document.getElementById('m5-feedback');
+            const buttons = document.querySelectorAll('#m5-bubbles button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                playSound('correct');
+                playSound('coin');
+                m5Points += 10;
+                feedback.innerText = "¡Correcto! ⭐ (Siguiente...)";
+                feedback.className = "text-base sm:text-lg font-bold text-green-600 min-h-[30px]";
+            } else {
+                playSound('wrong');
+                m5Points = Math.max(0, m5Points - 3);
+                feedback.innerText = `¡Incorrecto! Era ${correct}. (Siguiente...)`;
+                feedback.className = "text-base sm:text-lg font-bold text-red-500 min-h-[30px]";
+            }
+            document.getElementById('m5-points').innerText = m5Points;
+
+            setTimeout(() => {
+                m5Round++;
+                nextM5Round();
+            }, 1100);
+        }
+
+        // --- MÓDULO 6: ATRAPA DIVISIÓN ---
+        let m6Round = 1;
+        let m6Points = 0;
+
+        function initMod6() {
+            m6Round = 1;
+            m6Points = 0;
+            nextM6Round();
+            showScreen('mod6');
+        }
+
+        function nextM6Round() {
+            if (m6Round > 8) {
+                gameState.stars += 8;
+                gameState.coins += 20;
+                gameState.modulesCompleted[5] = true;
+                saveState();
+                showVictoryModal("¡Minijuego Superado!", `¡${gameState.studentName}, atrapaste las divisiones con ${m6Points} puntos!`, 8, 20);
+                return;
+            }
+
+            document.getElementById('m6-round').innerText = m6Round;
+            document.getElementById('m6-points').innerText = m6Points;
+            document.getElementById('m6-feedback').innerText = '';
+
+            const n = Math.floor(Math.random() * 10) + 1;
+            const total = 5 * n;
+            const qStr = `${total} ÷ 5 = ?`;
+            const correctAns = n;
+
+            document.getElementById('m6-target').innerText = qStr;
+
+            let options = [correctAns];
+            while (options.length < 4) {
+                let wrong = correctAns + (Math.floor(Math.random() * 6) - 3);
+                if (wrong > 0 && !options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('m6-bubbles');
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'pulse-btn bg-gradient-to-br from-red-400 to-orange-500 hover:from-red-500 hover:to-orange-600 text-white text-2xl sm:text-3xl font-black py-4 sm:py-6 rounded-3xl shadow-lg border-2 border-red-300 transition bouncing';
+                btn.innerText = opt;
+                btn.onclick = () => checkM6(opt, correctAns);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkM6(selected, correct) {
+            const feedback = document.getElementById('m6-feedback');
+            const buttons = document.querySelectorAll('#m6-bubbles button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                playSound('correct');
+                playSound('coin');
+                m6Points += 10;
+                feedback.innerText = "¡Correcto! 💫 (Siguiente...)";
+                feedback.className = "text-base sm:text-lg font-bold text-green-600 min-h-[30px]";
+            } else {
+                playSound('wrong');
+                m6Points = Math.max(0, m6Points - 3);
+                feedback.innerText = `¡Incorrecto! Era ${correct}. (Siguiente...)`;
+                feedback.className = "text-base sm:text-lg font-bold text-red-500 min-h-[30px]";
+            }
+            document.getElementById('m6-points').innerText = m6Points;
+
+            setTimeout(() => {
+                m6Round++;
+                nextM6Round();
+            }, 1100);
+        }
+
+        // --- MÓDULO 7: RESUELVE LA AVENTURA (PROBLEMAS PARA EL NÚMERO 5) ---
+        let m7Index = 0;
+        const m7Data = [
+            {
+                icon: "✋",
+                type: "mult",
+                title: "Manos Amigas",
+                story: "Vemos 6 niños. Cada niño levanta su mano con 5 dedos abiertos. ¿Cuántos dedos hay en total?",
+                ans: 30,
+                options: [25, 30, 35, 20]
+            },
+            {
+                icon: "🍕",
+                type: "div",
+                title: "Reparto de Pizza",
+                story: "Compramos 20 porciones de pizza y queremos repartirlas equitativamente entre 5 amigos. ¿Cuántas porciones recibe cada uno?",
+                ans: 4,
+                options: [3, 4, 5, 6]
+            },
+            {
+                icon: "⭐",
+                type: "mult",
+                title: "Estrellas Brillantes",
+                story: "En el cielo nocturno hay 5 constelaciones y cada constelación tiene 8 estrellas brillantes. ¿Cuántas estrellas hay en total?",
+                ans: 40,
+                options: [35, 40, 45, 30]
+            },
+            {
+                icon: "🍬",
+                type: "div",
+                title: "Dulces Compartidos",
+                story: "Tienes 35 dulces y los compartes en partes iguales con tus 5 amigos. ¿Cuántos dulces recibe cada uno?",
+                ans: 7,
+                options: [6, 7, 8, 9]
+            }
+        ];
+
+        function initMod7() {
+            m7Index = 0;
+            renderMod7();
+            showScreen('mod7');
+        }
+
+        function renderMod7() {
+            if (m7Index >= m7Data.length) {
+                gameState.stars += 7;
+                gameState.coins += 15;
+                gameState.modulesCompleted[6] = true;
+                checkAndGrantDiploma(7);
+                saveState();
+                showVictoryModal("¡Aventura Completada!", `¡${gameState.studentName}, resolviste con total precisión los problemas y obtuviste el Diploma del Módulo 7!`, 7, 15);
+                return;
+            }
+
+            const item = m7Data[m7Index];
+            document.getElementById('m7-progress').innerText = `Reto ${m7Index + 1}/${m7Data.length}`;
+            document.getElementById('m7-icon').innerText = item.icon;
+            document.getElementById('m7-title').innerText = item.title;
+            document.getElementById('m7-story').innerText = item.story;
+            document.getElementById('m7-feedback').innerText = '';
+
+            const container = document.getElementById('m7-options');
+            container.innerHTML = '';
+            
+            const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'pulse-btn bg-white hover:bg-blue-100 text-blue-800 text-xl sm:text-2xl font-black py-3 sm:py-4 rounded-2xl shadow-lg border-2 border-blue-300 transition';
+                btn.innerText = opt;
+                btn.onclick = () => checkM7(opt, item.ans);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkM7(selected, correct) {
+            const feedback = document.getElementById('m7-feedback');
+            const buttons = document.querySelectorAll('#m7-options button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                playSound('correct');
+                feedback.innerText = "¡Muy bien! 🎉 (Siguiente reto...)";
+                feedback.className = "text-base sm:text-lg font-bold text-green-600 min-h-[30px]";
+            } else {
+                playSound('wrong');
+                feedback.innerText = `¡Ánimo! La respuesta correcta era ${correct}. (Siguiente...)`;
+                feedback.className = "text-base sm:text-lg font-bold text-red-500 min-h-[30px]";
+            }
+
+            setTimeout(() => {
+                m7Index++;
+                renderMod7();
+            }, 1200);
+        }
+
+        // --- MÓDULO 8: JUEGO TIPO CONCÉNTRESE – MULTIPLICACIONES POR 5 (20 TARJETAS / 10 PAREJAS) ---
+        let memoryCards = [];
+        let firstCard = null;
+        let secondCard = null;
+        let lockBoard = false;
+        let memoryMatches = 0;
+        let memoryMoves = 0;
+
+        const m8BasePairs = [
+            { id: 1, text: "5 × 1" }, { id: 1, text: "5" },
+            { id: 2, text: "5 × 2" }, { id: 2, text: "10" },
+            { id: 3, text: "5 × 3" }, { id: 3, text: "15" },
+            { id: 4, text: "5 × 4" }, { id: 4, text: "20" },
+            { id: 5, text: "5 × 5" }, { id: 5, text: "25" },
+            { id: 6, text: "5 × 6" }, { id: 6, text: "30" },
+            { id: 7, text: "5 × 7" }, { id: 7, text: "35" },
+            { id: 8, text: "5 × 8" }, { id: 8, text: "40" },
+            { id: 9, text: "5 × 9" }, { id: 9, text: "45" },
+            { id: 10, text: "5 × 10" }, { id: 10, text: "50" }
+        ];
+
+        function initMod8() {
+            memoryMoves = 0;
+            memoryMatches = 0;
+            firstCard = null;
+            secondCard = null;
+            lockBoard = false;
+            document.getElementById('m8-moves').innerText = `Movs: 0`;
+            document.getElementById('m8-pairs').innerText = `Parejas: 0/10`;
+            startGlobalTimer('m8-timer');
+
+            memoryCards = JSON.parse(JSON.stringify(m8BasePairs));
+            shuffleMemoryCardsInternal();
+            renderMemoryGrid();
+            showScreen('mod8');
+        }
+
+        function shuffleMemoryCardsInternal() {
+            memoryCards.sort(() => Math.random() - 0.5);
+        }
+
+        function shuffleMemoryCards() {
+            playSound('click');
+            shuffleMemoryCardsInternal();
+            firstCard = null;
+            secondCard = null;
+            lockBoard = false;
+            renderMemoryGrid();
+        }
+
+        function renderMemoryGrid() {
+            const container = document.getElementById('memory-grid');
+            container.innerHTML = '';
+            memoryCards.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'bg-orange-600 hover:bg-orange-700 text-white font-black text-sm sm:text-base h-20 sm:h-24 rounded-2xl flex items-center justify-center cursor-pointer shadow-md transition transform active:scale-95 select-none p-2 text-center';
+                cardEl.dataset.index = index;
+                cardEl.dataset.id = card.id;
+                cardEl.innerText = '❓';
+                cardEl.onclick = () => flipMemoryCard(cardEl, card);
+                container.appendChild(cardEl);
+            });
+        }
+
+        function flipMemoryCard(cardEl, card) {
+            if (lockBoard) return;
+            if (cardEl === firstCard) return;
+            if (cardEl.classList.contains('matched')) return;
+
+            playSound('click');
+            cardEl.innerText = card.text;
+            cardEl.className = 'bg-white text-orange-800 border-4 border-orange-400 font-black text-sm sm:text-base h-20 sm:h-24 rounded-2xl flex items-center justify-center shadow-md transition p-2 text-center';
+
+            if (!firstCard) {
+                firstCard = cardEl;
+                firstCard.cardData = card;
+                return;
+            }
+
+            secondCard = cardEl;
+            secondCard.cardData = card;
+            memoryMoves++;
+            document.getElementById('m8-moves').innerText = `Movs: ${memoryMoves}`;
+            
+            checkForMemoryMatch();
+        }
+
+        function checkForMemoryMatch() {
+            const isMatch = firstCard.cardData.id === secondCard.cardData.id && firstCard.innerText !== secondCard.innerText;
+
+            if (isMatch) {
+                playSound('correct');
+                firstCard.classList.add('matched', 'bg-green-100', 'border-green-400', 'text-green-700');
+                secondCard.classList.add('matched', 'bg-green-100', 'border-green-400', 'text-green-700');
+                firstCard.onclick = null;
+                secondCard.onclick = null;
+                resetMemoryTurn();
+                memoryMatches++;
+                document.getElementById('m8-pairs').innerText = `Parejas: ${memoryMatches}/10`;
+
+                if (memoryMatches === 10) {
+                    stopGlobalTimer();
+                    gameState.stars += 10;
+                    gameState.coins += 25;
+                    gameState.modulesCompleted[7] = true;
+                    checkAndGrantDiploma(8);
+                    saveState();
+                    setTimeout(() => {
+                        showVictoryModal("¡Concéntrese Superado!", `¡${gameState.studentName}, encontraste las 10 parejas y ganaste el Diploma del Módulo 8!`, 10, 25);
+                    }, 500);
+                }
+            } else {
+                playSound('wrong');
+                lockBoard = true;
+                setTimeout(() => {
+                    firstCard.innerText = '❓';
+                    firstCard.className = 'bg-orange-600 hover:bg-orange-700 text-white font-black text-sm sm:text-base h-20 sm:h-24 rounded-2xl flex items-center justify-center cursor-pointer shadow-md transition p-2 text-center';
+                    secondCard.innerText = '❓';
+                    secondCard.className = 'bg-orange-600 hover:bg-orange-700 text-white font-black text-sm sm:text-base h-20 sm:h-24 rounded-2xl flex items-center justify-center cursor-pointer shadow-md transition p-2 text-center';
+                    resetMemoryTurn();
+                }, 1000);
+            }
+        }
+
+        function resetMemoryTurn() {
+            firstCard = null;
+            secondCard = null;
+            lockBoard = false;
+        }
+
+        // --- MÓDULO 9: JUEGO TIPO MATCH – DIVISIONES ENTRE 5 (18 OPERACIONES CON NIVELES) ---
+        const fullDivisionBank = [];
+        for (let i = 10; i <= 95; i += 5) {
+            fullDivisionBank.push({ id: (i / 5), div: `${i} ÷ 5`, res: `${i / 5}` });
+        }
+
+        let matchDifficulty = 'easy'; // easy (5), medium (10), hard (18)
+        let activeMatchPairs = [];
+        let matchLeftSelected = null;
+        let matchCorrectCount = 0;
+
+        function initMod9() {
+            document.getElementById('match-difficulty-panel').classList.remove('hidden');
+            document.getElementById('match-game-panel').classList.add('hidden');
+            showScreen('mod9');
+        }
+
+        function setMatchDifficulty(diff) {
+            playSound('click');
+            matchDifficulty = diff;
+            document.getElementById('match-difficulty-panel').classList.add('hidden');
+            document.getElementById('match-game-panel').classList.remove('hidden');
+            newMatchRound();
+        }
+
+        function newMatchRound() {
+            playSound('click');
+            matchLeftSelected = null;
+            matchCorrectCount = 0;
+            startGlobalTimer('m9-timer');
+
+            let count = 5;
+            if (matchDifficulty === 'medium') count = 10;
+            if (matchDifficulty === 'hard') count = 18;
+
+            let shuffledPool = [...fullDivisionBank].sort(() => Math.random() - 0.5);
+            activeMatchPairs = JSON.parse(JSON.stringify(shuffledPool.slice(0, count)));
+            renderMatchGame();
+        }
+
+        function resetMatchGame() {
+            playSound('click');
+            matchLeftSelected = null;
+            matchCorrectCount = 0;
+            activeMatchPairs.forEach(p => p.matched = false);
+            renderMatchGame();
+        }
+
+        function renderMatchGame() {
+            document.getElementById('m9-score').innerText = `Aciertos: ${matchCorrectCount}/${activeMatchPairs.length}`;
+            
+            const leftContainer = document.getElementById('match-left');
+            const rightContainer = document.getElementById('match-right');
+            leftContainer.innerHTML = '';
+            rightContainer.innerHTML = '';
+
+            const leftShuffled = [...activeMatchPairs].sort(() => Math.random() - 0.5);
+            const rightShuffled = [...activeMatchPairs].sort(() => Math.random() - 0.5);
+
+            leftShuffled.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `pulse-btn w-full py-3 px-4 rounded-2xl font-black text-lg sm:text-xl shadow-md border-2 transition ${item.matched ? 'bg-green-100 border-green-400 text-green-700 opacity-60 pointer-events-none' : 'bg-white border-amber-300 text-amber-800 hover:bg-amber-50'}`;
+                btn.innerText = item.div;
+                btn.dataset.id = item.id;
+                if (!item.matched) {
+                    btn.onclick = () => selectMatchLeft(btn, item);
+                }
+                leftContainer.appendChild(btn);
+            });
+
+            rightShuffled.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `pulse-btn w-full py-3 px-4 rounded-2xl font-black text-lg sm:text-xl shadow-md border-2 transition ${item.matched ? 'bg-green-100 border-green-400 text-green-700 opacity-60 pointer-events-none' : 'bg-white border-teal-300 text-teal-800 hover:bg-teal-50'}`;
+                btn.innerText = item.res;
+                btn.dataset.id = item.id;
+                if (!item.matched) {
+                    btn.onclick = () => selectMatchRight(btn, item);
+                }
+                rightContainer.appendChild(btn);
+            });
+        }
+
+        function selectMatchLeft(btn, item) {
+            playSound('click');
+            document.querySelectorAll('#match-left button').forEach(b => {
+                if (!b.classList.contains('opacity-60')) {
+                    b.classList.remove('ring-4', 'ring-amber-400', 'bg-amber-100');
+                }
+            });
+            btn.classList.add('ring-4', 'ring-amber-400', 'bg-amber-100');
+            matchLeftSelected = item;
+        }
+
+        function selectMatchRight(btn, item) {
+            if (!matchLeftSelected) {
+                playSound('click');
+                return;
+            }
+
+            if (matchLeftSelected.id === item.id) {
+                playSound('correct');
+                matchCorrectCount++;
+                activeMatchPairs.forEach(p => {
+                    if (p.id === item.id) p.matched = true;
+                });
+                matchLeftSelected = null;
+                renderMatchGame();
+
+                if (matchCorrectCount === activeMatchPairs.length) {
+                    stopGlobalTimer();
+                    gameState.stars += 10;
+                    gameState.coins += 25;
+                    gameState.modulesCompleted[8] = true;
+                    checkAndGrantDiploma(9);
+                    saveState();
+                    setTimeout(() => {
+                        showVictoryModal("¡Match de Divisiones Superado!", `¡${gameState.studentName}, relacionaste todas las divisiones (${matchDifficulty.toUpperCase()}) y ganaste el Diploma del Módulo 9!`, 10, 25);
+                    }, 500);
+                }
+            } else {
+                playSound('wrong');
+                matchLeftSelected = null;
+                document.querySelectorAll('#match-left button').forEach(b => {
+                    if (!b.classList.contains('opacity-60')) {
+                        b.classList.remove('ring-4', 'ring-amber-400', 'bg-amber-100');
+                    }
+                });
+            }
+        }
+
+        // --- MÓDULO 10: GRAN DESAFÍO MATEMÁTICO ---
+        let m10Questions = [];
+        let m10Current = 0;
+        let m10Correct = 0;
+
+        function initMod10() {
+            m10Current = 0;
+            m10Correct = 0;
+            m10Questions = [];
+            for (let i = 0; i < 5; i++) {
+                const n = Math.floor(Math.random() * 10) + 1;
+                m10Questions.push({ q: `5 × ${n} = ?`, ans: 5 * n });
+            }
+            for (let i = 0; i < 5; i++) {
+                const n = Math.floor(Math.random() * 10) + 1;
+                const total = 5 * n;
+                m10Questions.push({ q: `${total} ÷ 5 = ?`, ans: n });
+            }
+            m10Questions.sort(() => Math.random() - 0.5);
+            renderMod10();
+            showScreen('mod10');
+        }
+
+        function renderMod10() {
+            if (m10Current >= m10Questions.length) {
+                const scorePercent = (m10Correct / 10) * 100;
+                let rewardStars = m10Correct;
+                let rewardCoins = m10Correct * 3;
+                gameState.stars += rewardStars;
+                gameState.coins += rewardCoins;
+                if (m10Correct >= 8) gameState.medals += 1;
+                gameState.modulesCompleted[9] = true;
+                
+                if (m10Correct === 10) {
+                    gameState.modulesCompleted[7] = true;
+                    gameState.modulesCompleted[8] = true;
+                    checkAndGrantDiploma(7);
+                    checkAndGrantDiploma(8);
+                    checkAndGrantDiploma(9);
+                    checkAndGrantDiploma(10);
+                } else if (m10Correct >= 8) {
+                    checkAndGrantDiploma(10);
+                }
+
+                saveState();
+                
+                let successMessage = `¡${gameState.studentName}, obtuviste ${m10Correct} de 10 aciertos (${scorePercent}%)!`;
+                if (m10Correct === 10) {
+                    successMessage += "<br><br>🌟 ¡FELICIDADES! ¡Puntaje perfecto! ¡Has desbloqueado los 4 diplomas de excelencia!";
+                }
+
+                showVictoryModal("¡Gran Desafío Finalizado!", successMessage, rewardStars, rewardCoins);
+                return;
+            }
+
+            const item = m10Questions[m10Current];
+            document.getElementById('m10-counter').innerText = `Pregunta ${m10Current + 1}/10`;
+            document.getElementById('m10-question').innerText = item.q;
+            document.getElementById('m10-feedback').innerText = '';
+
+            let options = [item.ans];
+            while (options.length < 4) {
+                let wrong = item.ans + (Math.floor(Math.random() * 6) - 3);
+                if (wrong >= 0 && !options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('m10-options');
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'pulse-btn bg-white hover:bg-red-100 text-red-800 text-xl sm:text-2xl font-black py-3 sm:py-4 rounded-2xl shadow-lg border-2 border-red-300 transition';
+                btn.innerText = opt;
+                btn.onclick = () => checkM10(opt, item.ans);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkM10(selected, correct) {
+            const feedback = document.getElementById('m10-feedback');
+            const buttons = document.querySelectorAll('#m10-options button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                playSound('correct');
+                feedback.innerText = "¡Excelente! 🌟 (Siguiente...)";
+                feedback.className = "text-base sm:text-lg font-bold text-green-600 min-h-[30px]";
+                m10Correct++;
+            } else {
+                playSound('wrong');
+                feedback.innerText = `¡Incorrecto! Era ${correct}. (Siguiente...)`;
+                feedback.className = "text-base sm:text-lg font-bold text-red-500 min-h-[30px]";
+            }
+
+            setTimeout(() => {
+                m10Current++;
+                renderMod10();
+            }, 1100);
+        }
+
+        // --- DIPLOMA & CELEBRATION MODULE ---
+        function checkDiplomaEligibility() {
+            playSound('click');
+            const concentreseDone = gameState.modulesCompleted[7];
+            const matchDone = gameState.modulesCompleted[8];
+
+            if (!concentreseDone || !matchDone) {
+                alert("¡Aún te falta completar el Concéntrese (Módulo 8) y el Match de Divisiones (Módulo 9) para desbloquear tu diploma oficial!");
+                return;
+            }
+
+            openSpecificDiploma(10);
+        }
+
+        function openSpecificDiploma(modNum) {
+            playSound('click');
+            const titles = {
+                7: { sub: "Módulo 7 – Resuelve la Aventura", main: "Diploma de Resolución de Problemas", rec: "«EXPLORADOR MATEMÁTICO»", desc: "Por haber completado satisfactoriamente los desafíos de problemas cotidianos con la tabla del 5 y sus divisiones." },
+                8: { sub: "Módulo 8 – Concéntrese de Multiplicación", main: "Diploma de Memoria y Concentración", rec: "«MAESTRO DEL CONCÉNTRESE»", desc: "Por haber superado el reto de memoria asociando con éxito las multiplicaciones de la tabla del 5 y sus resultados." },
+                9: { sub: "Módulo 9 – Match de Divisiones", main: "Diploma de Destreza en División", rec: "«CAMPEÓN DE LA DIVISIÓN»", desc: "Por haber completado todas las operaciones de división de dos cifras entre 5 en el juego interactivo Match." },
+                10: { sub: "Módulo 10 – Gran Desafío Matemático", main: "Diploma de Excelencia Matemática", rec: "«CAMPEÓN SUPREMO DE LAS MATEMÁTICAS»", desc: "Por haber completado satisfactoriamente los desafíos de aprendizaje de la tabla de multiplicar del 5 y las divisiones entre 5." }
+            };
+
+            const info = titles[modNum] || titles[10];
+            document.getElementById('diploma-subtitle').innerText = info.sub;
+            document.getElementById('diploma-main-title').innerText = info.main;
+            document.getElementById('diploma-recognition').innerText = `Reconocimiento oficial: «${info.rec}»`;
+            document.getElementById('diploma-description').innerText = info.desc;
+            document.getElementById('diploma-student-name').innerText = gameState.studentName;
+            
+            const dateStr = gameState.diplomasData[modNum] || new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('diploma-date').innerText = dateStr;
+
+            showScreen('diploma-celebration');
+        }
+
+        function downloadPDFDiploma() {
+            playSound('win');
+            const originalTitle = document.title;
+            document.title = `Diploma_${gameState.studentName.replace(/\s+/g, '_')}.pdf`;
+            window.print();
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 1000);
+        }
+
+        // --- GALERÍA DE DIPLOMAS ---
+        function renderDiplomaGallery() {
+            const container = document.getElementById('gallery-cards-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const modules = [
+                { mod: 7, name: "Módulo 7: Resuelve la Aventura", desc: "Problemas cotidianos con la tabla y división del 5" },
+                { mod: 8, name: "Módulo 8: Concéntrese del 5", desc: "Juego de memoria con 20 tarjetas de multiplicación" },
+                { mod: 9, name: "Módulo 9: Match de Divisiones", desc: "Relación de divisiones exactas de dos cifras entre 5" },
+                { mod: 10, name: "Módulo 10: Gran Desafío Matemático", desc: "Examen final combinado con medalla de oro" }
+            ];
+
+            let obtainedCount = 0;
+            modules.forEach(m => {
+                const isUnlocked = !!gameState.diplomasData[m.mod];
+                if (isUnlocked) obtainedCount++;
+
+                const card = document.createElement('div');
+                card.className = `rounded-3xl p-5 border-4 flex flex-col justify-between shadow-lg ${isUnlocked ? 'bg-orange-50 border-orange-400' : 'bg-gray-50 border-gray-300 opacity-80'}`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-orange-200 text-orange-900 text-xs font-black px-3 py-1 rounded-full">Módulo ${m.mod}</span>
+                            <span class="text-2xl">${isUnlocked ? '🏆' : '🔒'}</span>
+                        </div>
+                        <h4 class="text-base sm:text-lg font-black text-orange-900 mb-1">${m.name}</h4>
+                        <p class="text-xs font-bold text-gray-600 mb-3">${m.desc}</p>
+                        <p class="text-xs font-extrabold ${isUnlocked ? 'text-green-700' : 'text-amber-700'} mb-4">
+                            ${isUnlocked ? '✔️ Obtenido el: ' + gameState.diplomasData[m.mod] : '🔒 Pendiente: Completa este módulo para desbloquear'}
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button ${!isUnlocked ? 'disabled' : ''} onclick="openSpecificDiploma(${m.mod})" class="flex-1 py-2.5 rounded-xl font-bold transition text-xs sm:text-sm shadow ${isUnlocked ? 'bg-orange-600 hover:bg-orange-700 text-white cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
+                            👁️ Ver Diploma
+                        </button>
+                        <button ${!isUnlocked ? 'disabled' : ''} onclick="openSpecificDiploma(${m.mod}); setTimeout(downloadPDFDiploma, 300);" class="flex-1 py-2.5 rounded-xl font-bold transition text-xs sm:text-sm shadow ${isUnlocked ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
+                            📥 Descargar PDF
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('gallery-progress-title').innerText = `${obtainedCount} de 4 diplomas obtenidos`;
+            const percent = (obtainedCount / 4) * 100;
+            document.getElementById('gallery-progress-bar').style.width = `${percent}%`;
+
+            const msgEl = document.getElementById('gallery-progress-msg');
+            if (obtainedCount === 4) {
+                msgEl.innerText = `¡INCREÍBLE, ${gameState.studentName}! ¡Has conseguido los 4 diplomas! ¡Eres un verdadero campeón de las matemáticas! 🌟`;
+                msgEl.className = "text-xs sm:text-sm font-black text-green-700 mb-3";
+            } else {
+                msgEl.innerText = "¡Completa los módulos 7, 8, 9 y 10 para llenar tu galería de campeones!";
+                msgEl.className = "text-xs sm:text-sm font-bold text-gray-600 mb-3";
+            }
+        }
+
+        function downloadAllDiplomas() {
+            playSound('win');
+            const obtainedKeys = Object.keys(gameState.diplomasData);
+            if (obtainedKeys.length === 0) {
+                alert("Aún no has obtenido ningún diploma. ¡Completa módulos para agregarlos a tu galería!");
+                return;
+            }
+            alert(`¡Preparando paquete ZIP con tus ${obtainedKeys.length} diplomas obtenidos, ${gameState.studentName}!\n\nSe abrirá el sistema de impresión para empaquetarlos.`);
+            openSpecificDiploma(parseInt(obtainedKeys[0]));
+            setTimeout(downloadPDFDiploma, 500);
+        }
+
+        const originalShowScreen = showScreen;
+        showScreen = function(screenId) {
+            originalShowScreen(screenId);
+            if (screenId === 'diploma-gallery') {
+                renderDiplomaGallery();
+            }
+        };
+
+        // --- TIENDA DE ACCESORIOS ---
+        const shopItems = [
+            { id: 'base', name: 'Zorrito Foxy', cost: 0, icon: '🦊' },
+            { id: 'cap', name: 'Gorra de Explorador', cost: 20, icon: '🧢' },
+            { id: 'crown', name: 'Corona del Saber', cost: 50, icon: '👑' },
+            { id: 'glasses', name: 'Lentes Geniales', cost: 35, icon: '🕶️' }
+        ];
+
+        function renderShop() {
+            const container = document.getElementById('shop-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            shopItems.forEach(item => {
+                const isUnlocked = gameState.unlockedAccessories.includes(item.id);
+                const isActive = gameState.activeAccessory === item.id;
+
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-3xl p-5 sm:p-6 shadow-lg border-4 ${isActive ? 'border-orange-600 ring-4 ring-orange-200' : 'border-yellow-300'} flex flex-col items-center text-center justify-between`;
+                
+                card.innerHTML = `
+                    <div class="text-5xl sm:text-6xl mb-3 bouncing">${item.icon}</div>
+                    <h4 class="text-base sm:text-lg font-black text-orange-800 mb-1">${item.name}</h4>
+                    <p class="text-xs sm:text-sm font-bold text-gray-500 mb-3 sm:mb-4">${item.cost === 0 ? '¡Gratis!' : item.cost + ' 🪙'}</p>
+                `;
+
+                const btn = document.createElement('button');
+                btn.className = `w-full py-2.5 rounded-2xl font-bold transition shadow text-sm sm:text-base ${
+                    isActive ? 'bg-orange-600 text-white' :
+                    isUnlocked ? 'bg-amber-500 hover:bg-amber-600 text-white' :
+                    'bg-yellow-400 hover:bg-yellow-500 text-yellow-900'
+                }`;
+                btn.innerText = isActive ? 'Equipado ✨' : isUnlocked ? 'Equipar' : 'Comprar 🪙';
+                btn.onclick = () => handleShopAction(item);
+
+                card.appendChild(btn);
+                container.appendChild(card);
+            });
+        }
+
+        function handleShopAction(item) {
+            playSound('click');
+            if (gameState.unlockedAccessories.includes(item.id)) {
+                gameState.activeAccessory = item.id;
+                saveState();
+                renderShop();
+            } else if (gameState.coins >= item.cost) {
+                gameState.coins -= item.cost;
+                gameState.unlockedAccessories.push(item.id);
+                gameState.activeAccessory = item.id;
+                saveState();
+                renderShop();
+                playSound('coin');
+            } else {
+                playSound('wrong');
+            }
+        }
+
+        // --- ESTADÍSTICAS Y LOGROS ---
+        function renderStats() {
+            const container = document.getElementById('badges-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const badges = [
+                { title: 'Tabla del 5', desc: 'Completa Módulo 1', unlocked: gameState.modulesCompleted[0], icon: '✖️' },
+                { title: 'Dividir entre 5', desc: 'Completa Módulo 2', unlocked: gameState.modulesCompleted[1], icon: '➗' },
+                { title: 'Completa Mult', desc: 'Completa Módulo 3', unlocked: gameState.modulesCompleted[2], icon: '🧩' },
+                { title: 'Completa Div', desc: 'Completa Módulo 4', unlocked: gameState.modulesCompleted[3], icon: '🔍' },
+                { title: 'Atrapa Mult', desc: 'Completa Módulo 5', unlocked: gameState.modulesCompleted[4], icon: '⭐' },
+                { title: 'Atrapa Div', desc: 'Completa Módulo 6', unlocked: gameState.modulesCompleted[5], icon: '💫' },
+                { title: 'Aventurero', desc: 'Completa Módulo 7', unlocked: gameState.modulesCompleted[6], icon: '🌳' },
+                { title: 'Concéntrese 20', desc: 'Completa Módulo 8', unlocked: gameState.modulesCompleted[7], icon: '🧠' },
+                { title: 'Match 18 Ops', desc: 'Completa Módulo 9', unlocked: gameState.modulesCompleted[8], icon: '🔗' },
+                { title: 'Maestro Supremo', desc: 'Completa Gran Desafío', unlocked: gameState.modulesCompleted[9], icon: '🏆' }
+            ];
+
+            badges.forEach(b => {
+                const badgeDiv = document.createElement('div');
+                badgeDiv.className = `rounded-3xl p-3 sm:p-4 border-2 flex flex-col items-center text-center ${b.unlocked ? 'bg-orange-50 border-orange-400 shadow-md' : 'bg-gray-100 border-gray-300 opacity-60'}`;
+                badgeDiv.innerHTML = `
+                    <div class="text-3xl sm:text-4xl mb-2">${b.icon}</div>
+                    <h4 class="font-black text-orange-800 text-xs sm:text-sm mb-1">${b.title}</h4>
+                    <p class="text-[10px] sm:text-xs text-gray-500 font-bold">${b.desc}</p>
+                    <span class="mt-2 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full ${b.unlocked ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}">
+                        ${b.unlocked ? '¡Desbloqueado! ✔️' : 'Bloqueado 🔒'}
+                    </span>
+                `;
+                container.appendChild(badgeDiv);
+            });
+        }
+
+        // --- VICTORIA MODAL ---
+        function showVictoryModal(title, desc, stars, coins) {
+            playSound('win');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            
+            const rewardsContainer = document.getElementById('modal-rewards');
+            rewardsContainer.innerHTML = `
+                <div class="flex items-center bg-yellow-100 border-2 border-yellow-400 px-3 sm:px-4 py-2 rounded-2xl font-black text-yellow-800 text-sm sm:text-base">
+                    <span class="text-xl sm:text-2xl mr-2">⭐</span> +${stars}
+                </div>
+                <div class="flex items-center bg-amber-100 border-2 border-amber-400 px-3 sm:px-4 py-2 rounded-2xl font-black text-amber-800 text-sm sm:text-base">
+                    <span class="text-xl sm:text-2xl mr-2">🪙</span> +${coins}
+                </div>
+            `;
+            document.getElementById('modal-victory').classList.remove('hidden');
+        }
+
+        function closeModalAndHome() {
+            playSound('click');
+            document.getElementById('modal-victory').classList.add('hidden');
+            showScreen('home');
+        }
+
+        // Initial setup
+        window.onload = () => {
+            updateHUD();
+            if (!gameState.studentName) {
+                showScreen('register');
+            } else {
+                showScreen('home');
+            }
+        };
+    </script>
+</body>
+</html>
